@@ -55,6 +55,7 @@ export function fileUpload(customValidation = []) {
             cb('In-valid file format', false)
         }
     }
+   
     const upload = multer({ fileFilter, storage })
     return upload
 }

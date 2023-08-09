@@ -3,7 +3,7 @@ import { generalFields } from '../../middleware/validation.js'
 
 export const addCategoryVal = {
     body: joi.object().required().keys({
-        name: generalFields.name,
+        name: generalFields.name.required(),
     }),
     file: generalFields.file.required().messages({
         'any.required': 'Please upload a file',

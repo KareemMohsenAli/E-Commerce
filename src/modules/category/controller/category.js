@@ -34,14 +34,19 @@ export const updateCategory = async (req, res, next) => {
       cause: StatusCodes.CONFLICT,
     });
   }
-  const checkName = await categoryModel.findOne({
-    name,
-    _id: { $ne: categoryId },
-  });
-  if (checkName) {
-    return next(new Error("name is already exist"), {
-      cause: StatusCodes.CONFLICT,
+
+  if(name){
+    const checkName = await categoryModel.findOne({
+      name,
+      _id: { $ne: categoryId },
     });
+    if (checkName) {
+      return next(new Error("name is already exist"), {
+        cause: StatusCodes.CONFLICT,
+      });
+    }
+    categoryIsExist.name = name;
+    categoryIsExist.slug = slugify(name);
   }
 
   if (req.file) {
@@ -55,8 +60,7 @@ export const updateCategory = async (req, res, next) => {
     );
     categoryIsExist.image = { public_id, secure_url };
   }
-  categoryIsExist.name = name;
-  categoryIsExist.slug = slugify(name);
+
   const updatedCategory = await categoryIsExist.save();
   return res.status(StatusCodes.ACCEPTED).json({
     message: "Category updated successfully",

@@ -1,6 +1,6 @@
 import joi from 'joi'
 import { Types } from 'mongoose'
-const dataMethods = ["body", 'params', 'query', 'headers', 'file']
+const dataMethods = ["body", 'params', 'query', 'headers', 'file','files']
 
 const validateObjectId = (value, helper) => {
     console.log({ value });
@@ -17,7 +17,7 @@ export const generalFields = {
     password: joi.string(),
     cPassword: joi.string().required(),
     id: joi.string().custom(validateObjectId).required(),
-    name: joi.string().regex(/^[a-z]+$/).required().messages({
+    name: joi.string().regex(/^[a-z ]+$/).messages({
         'string.pattern.base': 'Name must contain lowercase characters only',
       }),
     file: joi.object({
@@ -29,7 +29,19 @@ export const generalFields = {
         encoding: joi.string().required(),
         originalname: joi.string().required(),
         fieldname: joi.string().required()
-    })
+    }),
+    coverImages: joi.array().items(
+        joi.object({
+          size: joi.number().positive().required(),
+          path: joi.string().required(),
+          filename: joi.string().required(),
+          destination: joi.string().required(),
+          mimetype: joi.string().required(),
+          encoding: joi.string().required(),
+          originalname: joi.string().required(),
+          fieldname: joi.string().required(),
+        })
+      )
 }
 
 export const validation = (schema) => {

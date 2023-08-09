@@ -1,14 +1,18 @@
 import { Router } from "express";
-const router = Router()
+import * as productController from "./controller/product.js";
+import { fileUpload, fileValidation } from "../../utils/multer.js";
+import { validation } from "../../middleware/validation.js";
+import { addProductVal } from "./product.validation.js";
+const router = Router();
 
+router.post(
+  "/",
+  fileUpload(fileValidation.image).fields([
+    { name: "image", maxCount: 1 },
+    { name: "coverImages", maxCount:5 },
+  ]),
+  validation(addProductVal), 
+  productController.addNewProduct
+);
 
-
-
-router.get('/', (req ,res)=>{
-    res.status(200).json({message:"product Module"})
-})
-
-
-
-
-export default router
+export default router;

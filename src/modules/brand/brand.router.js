@@ -1,14 +1,32 @@
 import { Router } from "express";
-const router = Router()
+import * as brandContoller from "./controller/brand.js";
+import { validation } from "../../middleware/validation.js";
+import { addBrandVal, deleteBrandVal, updateBrandVal } from "./brand.validation.js";
+import { fileUpload, fileValidation } from "../../utils/multer.js";
+import { asyncHandler } from "../../utils/errorHandling.js";
+
+const router = Router();
+
+router.post(
+  "/",
+  fileUpload(fileValidation.image).single("image"),
+  validation(addBrandVal),
+ asyncHandler( brandContoller.addBrand)
+);
 
 
+router.put(
+    "/:brandId",
+    fileUpload(fileValidation.image).single("image"),
+    validation(updateBrandVal),
+   asyncHandler( brandContoller.updateBrand)
+  );
+  
 
+  router.delete(
+    "/:brandId",
+    validation(deleteBrandVal),
+   asyncHandler( brandContoller.deleteBrand)
+  );
 
-router.get('/', (req ,res)=>{
-    res.status(200).json({message:"Brand Module"})
-})
-
-
-
-
-export default router
+export default router;

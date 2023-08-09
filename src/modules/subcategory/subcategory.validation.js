@@ -2,7 +2,7 @@ import joi from 'joi'
 import { generalFields } from '../../middleware/validation.js'
 export const addSubCategoryVal = {
     body: joi.object().required().keys({
-        name: generalFields.name,
+            name: generalFields.name.required(),
         categoryID:generalFields.id
     }),
     file: generalFields.file.required().messages({
