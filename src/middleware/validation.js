@@ -17,9 +17,7 @@ export const generalFields = {
     password: joi.string(),
     cPassword: joi.string().required(),
     id: joi.string().custom(validateObjectId).required(),
-    name: joi.string().regex(/^[a-z ]+$/).messages({
-        'string.pattern.base': 'Name must contain lowercase characters only',
-      }),
+    name: joi.string(),
     file: joi.object({
         size: joi.number().positive().required(),
         path: joi.string().required(),

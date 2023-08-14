@@ -1,5 +1,6 @@
 import joi from "joi";
 import { generalFields } from "../../middleware/validation.js";
+import { deleteValidationHandler } from "../../utils/globalErrorValidation.js";
 export const addProductVal = {
   body: joi.object().required().keys({
       name: generalFields.name.required(),
@@ -28,7 +29,7 @@ export const addProductVal = {
           if (!Array.isArray(colorsArray)) {
             throw new Error('Invalid array format');
           }
-          const allStrings = colorsArray.every(item => typeof item === 'number');
+          const allStrings = colorsArray.every(item => typeof item === 'string');
           if (!allStrings) {
             throw new Error('Array must contain only strings');
           }
@@ -63,3 +64,52 @@ export const addProductVal = {
   params: joi.object().required().keys({}),
   query: joi.object().required().keys({}),
 };
+export const updateProductVal = {
+  body: joi.object().required().keys({
+      name: generalFields.name,
+      description: joi.string(),
+      quantity: joi.number().integer().positive(),
+      price: joi.number().positive().precision(2),
+      discount: joi.number().min(0).max(100),
+      colors: joi.string().custom((value, helpers) => {
+        try {
+          const colorsArray = JSON.parse(value);
+          if (!Array.isArray(colorsArray)) {
+            throw new Error('Invalid array format');
+          }
+          const allStrings = colorsArray.every(item => typeof item === 'string'&& !Number(item));
+          if (!allStrings) {
+            throw new Error('Array must contain only strings');
+          }
+          return value; // Return the original JSON string if validation passes
+        } catch (error) {
+          throw new Error('Invalid array format');
+        }
+      }) ,
+      size:joi.string().custom((value, helpers) => {
+        try {
+          const colorsArray = JSON.parse(value);
+          if (!Array.isArray(colorsArray)) {
+            throw new Error('Invalid array format');
+          }
+          const allStrings = colorsArray.every(item => typeof item === 'string');
+          if (!allStrings) {
+            throw new Error('Array must contain only strings');
+          }
+          return value; // Return the original JSON string if validation passes
+        } catch (error) {
+          throw new Error('Invalid array format');
+        }
+      }),
+    }),
+  files: joi.object().required().keys({
+    coverImages: joi.array().items(generalFields.file).max(5),
+    image: joi.array()
+      .items(generalFields.file) .max(1)
+    }),
+  params: joi.object().required().keys({
+    id:generalFields.id
+  }),
+  query: joi.object().required().keys({}),
+};
+export const deleteProductVal = deleteValidationHandler(generalFields)

@@ -1,5 +1,6 @@
 import joi from "joi";
 import { generalFields } from "../../middleware/validation.js";
+import { deleteValidationHandler } from "../../utils/globalErrorValidation.js";
 export const addBrandVal = {
   body: joi.object().required().keys({
     name: generalFields.name.required(),
@@ -10,22 +11,14 @@ export const addBrandVal = {
   params: joi.object().required().keys({}),
   query: joi.object().required().keys({}),
 };
-
 export const updateBrandVal = {
   body: joi.object().required().keys({
     name: generalFields.name,
   }),
   file: generalFields.file,
   params: joi.object().required().keys({
-    brandId: generalFields.id,
+    id: generalFields.id,
   }),
   query: joi.object().required().keys({}),
 };
-
-export const deleteBrandVal = {
-  body: joi.object().required().keys({}),
-  params: joi.object().required().keys({
-    brandId: generalFields.id,
-  }),
-  query: joi.object().required().keys({}),
-};
+export const deleteBrandVal =deleteValidationHandler(generalFields)

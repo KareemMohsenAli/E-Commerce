@@ -9,5 +9,5 @@ export const asyncHandler = (fn) => {
 }
 
 export const globalErrorHandling = (error, req, res, next) => {
-    return res.status(error.cause || 400).json({ msgError: error.message, stack: error.stack })
+    return res.status(error.statusCode || 400).json({ msgError: error.message, stack: error.stack })
 }

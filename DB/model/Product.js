@@ -2,9 +2,9 @@ import { model, Schema, Types } from "mongoose";
 
 const productSchema = new Schema(
   {
-    name: { type: String,  },
-    slug: { type: String,  },//mota7 kam wa7da
-    description: { type: String, required: true},
+    name: { type: String,  required: true , required:true,unique:true},
+    slug: { type: String,  required: true },//mota7 kam wa7da
+    description: { type: String, required:true ,unique:true},
     stock: { type: Number, required: true, default: 1 },
     price: { type: Number, required: true, default: 0 },
     discount: { type: Number, default: 0 },

@@ -3,6 +3,8 @@ import cloudinary from "../../../utils/cloudinary.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import subCategoryModel from "../../../../DB/model/Subcategory.model.js";
 import categoryModel from "../../../../DB/model/Category.model.js";
+import { AppError } from "../../../utils/AppError.js";
+import { deletedOne, getallApiFeatures } from "../../../Refactors/Refactor.js";
 export const addSubCategory = async (req, res, next) => {
   const { name, categoryID } = req.body;
   const slug = slugify(name, {
@@ -11,15 +13,11 @@ export const addSubCategory = async (req, res, next) => {
   });
   const categoryExist = await categoryModel.findById(categoryID);
   if (!categoryExist) {
-    return next(new Error("category not found", {
-      cause: StatusCodes.CONFLICT,
-    }));
+    return next(new AppError("category not found",StatusCodes.CONFLICT));
   }
   const nameExist = await subCategoryModel.findOne({ name });
   if (nameExist) {
-    return next(new Error("name is already exist",{
-      cause: StatusCodes.CONFLICT,
-    }));
+    return next(new AppError("name is already exist",StatusCodes.CONFLICT));
   }
   const { public_id, secure_url } = await cloudinary.uploader.upload(
     req.file.path,
@@ -38,9 +36,7 @@ export const updateSubCategory = async (req, res, next) => {
   const { subCategoryId } = req.params;
   const categoryIsExist = await subCategoryModel.findById(subCategoryId);
   if (!categoryIsExist) {
-    return next(new Error("Subcategory not found", {
-      cause: StatusCodes.CONFLICT,
-    }));
+    return next(new AppError("Subcategory not found",StatusCodes.CONFLICT));
   }
   if (name) {
     const checkName = await subCategoryModel.findOne({
@@ -48,9 +44,7 @@ export const updateSubCategory = async (req, res, next) => {
       _id: { $ne: subCategoryId },
     });
     if (checkName) {
-      return next(new Error("name is already exist",{
-        cause: StatusCodes.CONFLICT,
-      }));
+      return next(new AppError("name is already exist",StatusCodes.CONFLICT));
     }
     categoryIsExist.name = name;
     categoryIsExist.slug = slugify(name);
@@ -73,32 +67,8 @@ export const updateSubCategory = async (req, res, next) => {
     updatedCategory,
   });
 };
-export const deleteSubCategory = async (req, res, next) => {
-  const { subCategoryId } = req.params;
-  const deleteCategory = await subCategoryModel.findByIdAndDelete(
-    subCategoryId
-  );
-  if (!deleteCategory) {
-    return next(new Error("Subcategory not found", {
-      cause: StatusCodes.CONFLICT,
-    }));
-  }
-  await cloudinary.uploader.destroy(deleteCategory.image.public_id);
-  return res
-    .status(StatusCodes.ACCEPTED)
-    .json({ message: "category deleted succefully", deleteCategory });
-};
-export const searchBynameSubCat = async (req, res, next) => {
-  const { searchKey } = req.query;
-
-  const findCategory = await subCategoryModel.find({
-    name: { $regex: new RegExp(`${searchKey}`, "i") },
-  });
-  return res
-    .status(StatusCodes.ACCEPTED)
-    .json({ message: "Done", findCategory });
-};
-
+export const deleteSubCategory =deletedOne(subCategoryModel,"subCategory")
+export const getAllSubCatgory = getallApiFeatures(subCategoryModel)
 export const getAllSubCategories = async (req, res, next) => {
   console.log(req.params)
   const findCategory = await subCategoryModel.find(req.params).populate({path:"categoryID"});

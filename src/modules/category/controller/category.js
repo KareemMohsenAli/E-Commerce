@@ -2,6 +2,9 @@ import slugify from "slugify";
 import categoryModel from "../../../../DB/model/Category.model.js";
 import cloudinary from "../../../utils/cloudinary.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
+import { AppError } from "../../../utils/AppError.js";
+import { deletedOne, getallApiFeatures } from "../../../Refactors/Refactor.js";
+
 export const addCategory = async (req, res, next) => {
   const { name } = req.body;
   const slug = slugify(name, {
@@ -10,9 +13,7 @@ export const addCategory = async (req, res, next) => {
   });
   const isExist = await categoryModel.findOne({ name });
   if (isExist) {
-    return next(new Error("email is already exist"), {
-      cause: StatusCodes.CONFLICT,
-    });
+    return next(new AppError("email is already exist",StatusCodes.CONFLICT));
   }
   const { public_id, secure_url } = await cloudinary.uploader.upload(
     req.file.path,
@@ -27,23 +28,19 @@ export const addCategory = async (req, res, next) => {
 };
 export const updateCategory = async (req, res, next) => {
   const { name } = req.body;
-  const { categoryId } = req.params;
-  const categoryIsExist = await categoryModel.findById(categoryId);
+  const { id } = req.params;
+  const categoryIsExist = await categoryModel.findById(id);
   if (!categoryIsExist) {
-    return next(new Error("category not found"), {
-      cause: StatusCodes.CONFLICT,
-    });
+    return next(new AppError("category not found",StatusCodes.CONFLICT));
   }
 
-  if(name){
+  if (name) {
     const checkName = await categoryModel.findOne({
       name,
       _id: { $ne: categoryId },
     });
     if (checkName) {
-      return next(new Error("name is already exist"), {
-        cause: StatusCodes.CONFLICT,
-      });
+      return next(new AppError("name is already exist",StatusCodes.CONFLICT));
     }
     categoryIsExist.name = name;
     categoryIsExist.slug = slugify(name);
@@ -67,31 +64,18 @@ export const updateCategory = async (req, res, next) => {
     updatedCategory,
   });
 };
-export const deleteCategory = async (req, res, next) => {
-  const { categoryId } = req.params;
-  const deleteCategory = await categoryModel.findByIdAndDelete(categoryId);
-  if (!deleteCategory) {
-    return next(new Error("category not found"), {
-      cause: StatusCodes.CONFLICT,
+export const deleteCategory = deletedOne(categoryModel,"category")
+export const getAllCategories =getallApiFeatures(categoryModel)
+
+export const getAllCategoriesSubCategories = async (req, res, next) => {
+  const { id } = req.params;
+  const categoryWithSubcategories = await categoryModel
+    .findById(id)
+    .populate("subcategories")
+    .catch((error) => {
+      console.log("Population Error:", error);
     });
-  }
-  await cloudinary.uploader.destroy(deleteCategory.image.public_id)
-  return res.status(StatusCodes.ACCEPTED).json({ message: "category deleted succefully", deleteCategory });
+  return res
+    .status(StatusCodes.OK)
+    .json({ message: "Done", categoryWithSubcategories });
 };
-export const searchByname=async(req,res,next)=>{
-    const {searchKey}=req.query
-  
-    const findCategory=await categoryModel.find({name:{$regex: new RegExp(`${searchKey}`,"i")}})
-    return res.status(StatusCodes.ACCEPTED).json({ message: "Done", findCategory });
-
-}
-
-export const getAllCategoriesSubCategories=async(req,res,next)=>{
-    const {categoryId}=req.params
-    const categoryWithSubcategories = await categoryModel.findById(categoryId).populate('subcategories').catch((error) => {
-        console.log('Population Error:', error);
-      });
-    return res.status(StatusCodes.OK).json({ message: "Done", categoryWithSubcategories });
-
-}
-

@@ -1,5 +1,6 @@
 import joi from 'joi'
 import { generalFields } from '../../middleware/validation.js'
+import { deleteValidationHandler } from '../../utils/globalErrorValidation.js'
 
 export const addCategoryVal = {
     body: joi.object().required().keys({
@@ -17,21 +18,8 @@ export const updateCategoryVal = {
     }),
     file: generalFields.file,
     params: joi.object().required().keys({
-        categoryId:generalFields.id
+        id:generalFields.id
     }),
     query: joi.object().required().keys({})
 }
-export const deleteCategoryVal = {
-    body: joi.object().required().keys({}),
-    params: joi.object().required().keys({
-        categoryId:generalFields.id
-    }),
-    query: joi.object().required().keys({})
-}
-export const searchByNameVal = {
-    body: joi.object().required().keys({}),
-    params: joi.object().required().keys({}),
-    query: joi.object().required().keys({
-        searchKey:joi.string().required()
-    })
-}
+export const deleteCategoryVal = deleteValidationHandler(generalFields)
