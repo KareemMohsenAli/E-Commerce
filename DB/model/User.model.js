@@ -40,8 +40,9 @@ const userSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    image: String,
+    image: {type:Object},
     DOB: String,
+    code: {type:String,min: [2, 'minimum length 2 char'],max: [20, 'max length 2 char']},
 }, {
     timestamps: true
 })

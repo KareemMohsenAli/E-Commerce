@@ -58,30 +58,30 @@ export class ApiFeatures {
       totalPages,
     };
   }
-  // async getCounts() {
-  //   const aggregationPipeline = [
-  //     // Match stage to apply the same filters as the main query
-  //     {
-  //       $match: this.mongooseQuery._conditions,
-  //     },
-  //     // Group stage to count the total documents
-  //     {
-  //       $group: {
-  //         _id: null,
-  //         totalDocuments: { $sum: 1 },
-  //       },
-  //     },
-  //   ];
+  async getCounts() {
+    const aggregationPipeline = [
+      {
+        $match: this.mongooseQuery._conditions, //productmodel.find()
+      },
+      {
+        $group: {
+          _id: null,
+          totalDocuments: { $sum: 1 }, //count
+        },
+      },
+    ];
+
+  [{_id: null,totalDocuments:5}]
   
-  //   const countResult = await this.mongooseQuery.model.aggregate(aggregationPipeline);
+    const countResult = await this.mongooseQuery.model.aggregate(aggregationPipeline);
   
-  //   const totalDocuments = countResult.length > 0 ? countResult[0].totalDocuments : 0;
-  //   const totalPages = Math.ceil(totalDocuments / this.mongooseQuery.options.limit);
+    const totalDocuments = countResult.length > 0 ? countResult[0].totalDocuments : 0;
+    const totalPages = Math.ceil(totalDocuments / this.mongooseQuery.options.limit);
   
-  //   return {
-  //     totalDocuments,
-  //     totalPages,
-  //   };
-  // }
+    return {
+      totalDocuments,
+      totalPages,
+    };
+  }
   
 }
