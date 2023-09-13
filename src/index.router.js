@@ -15,7 +15,16 @@ import { globalErrorHandling } from './utils/errorHandling.js'
 
 const initApp = (app, express) => {
     //convert Buffer Data
-    app.use(express.json({}))
+    // app.use(express.json({}))
+    app.use((req,res,next)=>{
+        if(req.originalUrl=='/order/webhook'){
+            next()
+        }else{
+            express.json()(req,res,next)
+
+        }
+
+    })
     //Setup API Routing 
     app.use(`/auth`, authRouter)
     app.use(`/user`, userRouter)

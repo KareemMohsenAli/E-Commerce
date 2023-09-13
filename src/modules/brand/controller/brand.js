@@ -7,6 +7,7 @@ import { deletedOne, getallApiFeatures } from "../../../Refactors/Refactor.js";
 
 export const addBrand = async (req, res, next) => {
   const { name } = req.body;
+  const userId=req.user._id
   const slug = slugify(name);
   const nameExist = await BrandModel.findOne({ name });
   if (nameExist) {
@@ -19,6 +20,7 @@ export const addBrand = async (req, res, next) => {
   const addBrand = await BrandModel.create({
     name,
     slug,
+    userId,
     image: { public_id, secure_url },
   });
  return res.status(StatusCodes.CREATED).json({ message: "Done", addBrand });
@@ -26,6 +28,7 @@ export const addBrand = async (req, res, next) => {
 export const updateBrand = async (req, res, next) => {
   const { name } = req.body;
   const { id } = req.params;
+ 
 
   const brand = await BrandModel.findById(id);
   if (!brand) {

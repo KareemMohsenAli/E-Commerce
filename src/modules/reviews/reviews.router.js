@@ -1,14 +1,7 @@
 import { Router } from "express";
-const router = Router()
+import * as reviewContoller from "./controller/review.js";
+const router = Router();
 
+router.get("/",()=>{})
 
-
-
-router.get('/', (req ,res)=>{
-    res.status(200).json({message:"reviews Module"})
-})
-
-
-
-
-export default router
+export default router;

@@ -21,10 +21,10 @@ export const addNewProduct = async (req, res, next) => {
   const findDescription = await productModel.findOne({
     description: req.body.description,
   });
-  findDescription &&
-    next(
-      new AppError("you should write unique description", StatusCodes.CONFLICT)
-    );
+  
+
+
+  findDescription &&next(new AppError("you should write unique description", StatusCodes.CONFLICT));
   const isCategoryExist = await categoryModel.findById(req.body.categoryId);
   if (!isCategoryExist) {
     return next(new AppError("category is not found", StatusCodes.CONFLICT));
@@ -41,12 +41,9 @@ export const addNewProduct = async (req, res, next) => {
   }
   req.body.slug = slugify(req.body.name);
   req.body.stock = Number(req.body.quantity);
-  req.body.paymentPrice =
-    Number(req.body.price) -
-    Number(req.body.price) * (Number(req.body.discount || 0) / 100);
-  const { public_id, secure_url } = await cloudinary.uploader.upload(
-    req.files.image[0].path,
-    { folder: `E-Commerce/product/images` }
+  req.body.paymentPrice =Number(req.body.price) -Number(req.body.price) * (Number(req.body.discount || 0) / 100);
+  const { public_id, secure_url } = await cloudinary.uploader.upload(req.files.image[0].path,
+{ folder: `E-Commerce/product/images` }
   );
   req.body.image = { public_id, secure_url };
   if (req.files.coverImages?.length) {
@@ -67,7 +64,7 @@ export const addNewProduct = async (req, res, next) => {
   if (req.body.colors) {
     req.body.colors = JSON.parse(req.body.colors);
   }
-
+  req.body.createdBy=req.user._id
   const product = await productModel.create(req.body);
   return res.status(StatusCodes.OK).json({ message: "Done", product });
 };

@@ -7,6 +7,7 @@ import { AppError } from "../../../utils/AppError.js";
 import { deletedOne, getallApiFeatures } from "../../../Refactors/Refactor.js";
 export const addSubCategory = async (req, res, next) => {
   const { name, categoryID } = req.body;
+  const userId=req.user._id
   const slug = slugify(name, {
     lower: true, // Convert to lowercase
     strict: true, // Replace special characters with "-"
@@ -26,6 +27,7 @@ export const addSubCategory = async (req, res, next) => {
   const newCategory = await subCategoryModel.create({
     name,
     slug,
+    userId,
     image: { public_id, secure_url },
     categoryID,
   });

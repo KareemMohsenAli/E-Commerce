@@ -12,13 +12,16 @@ const productSchema = new Schema(
     colors: { type: Array },
     size: { type: Array },
     coverImages: { type:Array },
-    image: { type: Object},
+    image: { type: Object,required:true},
     categoryId: { type:Types.ObjectId, ref: "Category", required: true },
     subCategoryId: { type:Types.ObjectId, ref: "SubCategory", required: true },
     brandId:{ type:Types.ObjectId, ref: "Brand", required: true },
     avgRate: { type: Number,default: 0 },
     rateNo: { type: Number,default: 0},
     sold: { type: Number, default: 0 },//5ad kam wa7da
+    createdBy: { type: Types.ObjectId, ref: 'User', required: false },
+    wishList:[{ type: Types.ObjectId, ref: 'User', required: true }]
+
   },
   {
     timestamps: true,

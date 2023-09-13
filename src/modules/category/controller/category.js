@@ -7,6 +7,7 @@ import { deletedOne, getallApiFeatures } from "../../../Refactors/Refactor.js";
 
 export const addCategory = async (req, res, next) => {
   const { name } = req.body;
+  const userId=req.user._id
   const slug = slugify(name, {
     lower: true, // Convert to lowercase
     strict: true, // Replace special characters with "-"
@@ -22,6 +23,7 @@ export const addCategory = async (req, res, next) => {
   const newCategory = await categoryModel.create({
     name,
     slug,
+    userId,
     image: { public_id, secure_url },
   });
   return res.status(StatusCodes.CREATED).json({ message: "Done", newCategory });
@@ -57,7 +59,6 @@ export const updateCategory = async (req, res, next) => {
     );
     categoryIsExist.image = { public_id, secure_url };
   }
-
   const updatedCategory = await categoryIsExist.save();
   return res.status(StatusCodes.ACCEPTED).json({
     message: "Category updated successfully",

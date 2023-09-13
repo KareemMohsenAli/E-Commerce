@@ -8,6 +8,7 @@ import { emailVerificationTamplete } from "../../../utils/HtmlVerivication.js"
 import { nanoid } from "nanoid"
 import sendEmail from "../../../utils/email.js"
 import { generateToken } from "../../../utils/GenerateAndVerifyToken.js"
+import CartModel from "../../../../DB/model/cart.js"
 export const signUp=async(req,res,next)=>{
     const FindEmail=await userModel.findOne({email:req.body.email})
     if(FindEmail){
@@ -33,7 +34,8 @@ export const signUp=async(req,res,next)=>{
   req.body.userName=req.body.userName
   // const link = `http://localhost:5000/auth/comfirmEmail`;
   await sendEmail({ to: req.body.email, html: emailVerificationTamplete(createCode),subject:"ComfrimEmail" })
-  const user=await userModel.create(req.body) 
+  const user=await userModel.create(req.body)
+  await CartModel.create({userId:user._id}) 
   return res.status(StatusCodes.CREATED).json({message:"Done",user})
 }
 export const confirmEmail=async(req,res,next)=>{
@@ -59,7 +61,7 @@ export const signIn=async(req,res,next)=>{
   if(!match){
     return next(new AppError("invalid user information",StatusCodes.BAD_REQUEST))
   }
-  const token=generateToken({userId:user._id,email:user.email})
+  const token=generateToken({payload:{id:user._id,email:user.email}})
   return res.status(StatusCodes.OK).json({message:"Done",token})
 }
 export const sendEmailPinforgetPassword=async(req,res,next)=>{

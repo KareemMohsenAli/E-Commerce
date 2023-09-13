@@ -3,7 +3,7 @@ const BrandSchema = new Schema({
     name: { type: String, required: true,unique:true },
     slug: { type: String, required: true,unique:true  },
     image: { type: Object },
-    createdBy: { type: Types.ObjectId, ref: 'User', required: false },
+    createdBy: { type: Types.ObjectId, ref: 'User', required: true },
 }, {
     timestamps: true,
     },
